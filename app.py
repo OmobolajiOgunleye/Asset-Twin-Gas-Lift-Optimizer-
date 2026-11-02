@@ -5,17 +5,14 @@ from scipy.optimize import minimize
 import pandas as pd
 import plotly.graph_objects as go
 
-# --- PAGE CONFIGURATION & THEME ---
 st.set_page_config(page_title="AssetTwin - Gas Lift Optimizer", layout="wide")
 
-# Custom CSS styling for a highly polished, professional enterprise appearance
 st.markdown("""
     <style>
     .reportview-container { background: #f5f7f9; }
     h1 { color: #0e2433; font-weight: 700; }
     h3 { color: #2c3e50; font-weight: 500; }
     
-    /* This section fixes your invisible white boxes */
     .stMetric { 
         background-color: #ffffff !important; 
         padding: 15px; 
@@ -23,7 +20,7 @@ st.markdown("""
         border-radius: 8px; 
         box-shadow: 0 2px 4px rgba(0,0,0,0.05); 
     }
-    /* Explicitly forcing the text inside the boxes to be visible dark colors */
+
     .stMetric div {
         color: #0e2433 !important;
     }
@@ -31,15 +28,12 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 
-# --- HEADERS ---
 st.title("AssetTwin: Production Optimization Portal")
 st.markdown("### Algorithmic Resource Allocation & Well Bottlenecking Engine")
 st.write("This application wraps an industry-standard optimization algorithm around digital twins of live production wells to distribute constrained compressor gas automatically.")
 
-# --- SIDEBAR INTERACTIVE CONTROLS ---
 st.sidebar.header("Asset Constraints")
 
-# Replacing your hardcoded TOTAL_GAS_LIMIT = 300.0 with a live user slider
 TOTAL_GAS_LIMIT = st.sidebar.slider(
     "Total Field Gas Limit (MSCF/day)", 
     min_value=100.0, 
@@ -50,10 +44,9 @@ TOTAL_GAS_LIMIT = st.sidebar.slider(
 
 st.sidebar.markdown("---")
 st.sidebar.info(
-    "💡This software maps physical production constraints to mathematical limits, eliminating the manual guesswork traditionally done by operations engineers."
+    "This software maps physical production constraints to mathematical limits, eliminating the manual guesswork traditionally done by operations engineers."
 )
 
-# --- YOUR EXACT WELL PHYSICS MODEL ---
 well_coefficients = {
     'Well_1': (-0.005, 1.2, 50),
     'Well_2': (-0.008, 1.5, 30),
@@ -68,7 +61,6 @@ def calculate_well_production(q_gl, a, b, c):
     prod = (a * (q_gl ** 2)) + (b * q_gl) + c
     return max(prod, 0)
 
-# --- YOUR EXACT OPTIMIZATION ENGINE ---
 def objective_function(gas_allocation):
     total_production = 0
     for i, (well_name, coeffs) in enumerate(well_coefficients.items()):
@@ -81,18 +73,17 @@ def gas_limit_constraint(gas_allocation):
 
 constraints = {'type': 'ineq', 'fun': gas_limit_constraint}
 bounds = [(0, 100) for _ in range(5)]
-initial_guess = [TOTAL_GAS_LIMIT / 5.0] * 5  # Dynamically adjusts based on slider value
+initial_guess = [TOTAL_GAS_LIMIT / 5.0] * 5  
 
-# Execute Optimization
+
 result = minimize(objective_function, initial_guess, method='SLSQP', bounds=bounds, constraints=constraints)
 
-# --- STREAMLIT UI LAYOUT & GRAPHICS ---
 if result.success:
     optimized_allocations = result.x
     total_oil_production = -result.fun
     actual_gas_used = np.sum(optimized_allocations)
     
-    # 1. High-Level Performance Scorecard (KPI Cards)
+
     col1, col2, col3 = st.columns(3)
     with col1:
         st.metric("Maximized Asset Output", f"{total_oil_production:.2f} STB/day")
@@ -104,7 +95,6 @@ if result.success:
         
     st.markdown("---")
     
-    # 2. Interactive Charts Section
     chart_col1, chart_col2 = st.columns(2)
     
     with chart_col1:
@@ -123,7 +113,7 @@ if result.success:
         
     with chart_col2:
         st.subheader("Asset Breakdown Ledger")
-        # Build out a clean analytical table matching your output loop
+       
         ledger_data = []
         for i, (well_name, coeffs) in enumerate(well_coefficients.items()):
             well_prod = calculate_well_production(optimized_allocations[i], *coeffs)
