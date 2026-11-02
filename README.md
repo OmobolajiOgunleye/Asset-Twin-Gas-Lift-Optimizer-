@@ -35,3 +35,21 @@ Technical Stack
 Algorithmic Engine:Python, NumPy, SciPy (Optimization Module)
 Interactive Frontend:Streamlit Framework
 Data Visualization:Plotly Engine
+
+Local Installation:
+
+1) Download the repository structure:
+  bash
+git clone https://github.com
+cd asset-twin-gas-lift-optimizer
+
+2) Install environment dependencies:
+  bash
+pip install -r requirements.txt
+
+
+3) Launch the application locally:
+  bash
+streamlit run app.py
+
+
